@@ -1,25 +1,70 @@
+
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Peer Assignment 1"
+output: html_document
 ---
 
-
-## Loading and preprocessing the data
-
-
+## Loading and pre-processing data
+```{r echo=TRUE}
+mydata = read.csv(file = "/Users/xueyi/Documents/Personal/training material/Coursera - Reproducible Research/Assignment 1 - Daily Activity/activity.csv", head=TRUE, sep=",")
+summary(mydata)
+```
 
 ## What is mean total number of steps taken per day?
-
-
+```{r echo=TRUE}
+library(plyr)
+cdata = ddply(mydata, c("date"), summarise, steps=sum(steps, na.rm=TRUE))
+summary(cdata)
+mean_steps = mean(cdata$steps)
+median_steps = median(cdata$steps)
+hist(cdata$steps, main ="Total steps taken per day", xlab = "Steps")
+print(mean_steps)
+print(median_steps)
+```
 
 ## What is the average daily activity pattern?
-
-
+```{r echo = TRUE}
+library(plyr)
+ddata = ddply(mydata, c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
+summary(ddata)
+plot(ddata$sum_steps, type="l", xlab="5-minite Interval", ylab="Steps")
+print(max(ddata$sum_steps))
+```
 
 ## Imputing missing values
-
-
+```{r echo = TRUE}
+library(plyr)
+# calculate the total number of missing vlaues in the dataset
+missing_data = subset(mydata, is.na(steps))
+print (nrow(missing_data))
+# filling all missing values with mean for that 5-minute interval.
+edata = merge(mydata, subset(ddata, select=c("interval","mean")), by="interval")
+for(i in 1:nrow(edata)){
+  if (is.na(edata$steps[i]) == TRUE) {
+    edata$steps[i] = edata$mean[i]
+  }
+}
+edata = subset(edata, select=c("steps", "date", "interval"))
+summary(edata)
+# draw the histogram again
+c2data = ddply(edata, c("date"), summarise, steps=sum(steps, na.rm=TRUE))
+summary(c2data)
+mean_steps2 = mean(c2data$steps)
+median_steps2 = median(c2data$steps)
+hist(c2data$steps, main ="Total steps taken per day after filling NA", xlab = "Steps")
+print(mean_steps2)
+print(median_steps2)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r echo = TRUE}
+library(plyr)
+# add a new variable for weekday
+mydata$day <- as.factor(ifelse(weekdays(as.Date(mydata$date)) %in% c("Staturday","Sunday"), "Weekend", "Weekday"))
+summary(mydata)
+# plot the weekday and weekend
+d2data = ddply(subset(mydata, day=="Weekday"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
+d3data = ddply(subset(mydata, day=="Weekend"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
+plot(d2data$sum_steps, type="l", xlab="5-minite Interval", ylab="Number of Steps", main="Weekday")
+plot(d3data$sum_steps, type="l", xlab="5-minite Interval", ylab="Number of Steps", main="Weekend")
+```
