@@ -7,7 +7,7 @@ output: html_document
 ## Loading and pre-processing data
 
 ```r
-mydata = read.csv(file = "/Users/xueyi/Documents/Personal/training material/Coursera - Reproducible Research/Assignment 1 - Daily Activity/activity.csv", head=TRUE, sep=",")
+mydata = read.csv(file = "activity.csv", head=TRUE, sep=",")
 summary(mydata)
 ```
 
@@ -179,8 +179,8 @@ print(median_steps2)
 ```r
 library(plyr)
 # add a new variable for weekday
-mydata$day <- as.factor(ifelse(weekdays(as.Date(mydata$date)) %in% c("Staturday","Sunday"), "Weekend", "Weekday"))
-summary(mydata)
+edata$day <- as.factor(ifelse(weekdays(as.Date(edata$date)) %in% c("Staturday","Sunday"), "Weekend", "Weekday"))
+summary(edata)
 ```
 
 ```
@@ -189,15 +189,15 @@ summary(mydata)
 ##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8   Weekend: 2304  
 ##  Median :  0.00   2012-10-03:  288   Median :1177.5                  
 ##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5                  
-##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2                  
+##  3rd Qu.: 27.00   2012-10-05:  288   3rd Qu.:1766.2                  
 ##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0                  
-##  NA's   :2304     (Other)   :15840
+##                   (Other)   :15840
 ```
 
 ```r
 # plot the weekday and weekend
-d2data = ddply(subset(mydata, day=="Weekday"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
-d3data = ddply(subset(mydata, day=="Weekend"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
+d2data = ddply(subset(edata, day=="Weekday"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
+d3data = ddply(subset(edata, day=="Weekend"), c("interval"), summarise, sum_steps=sum(steps, na.rm=TRUE), mean=mean(steps, na.rm=TRUE))
 plot(d2data$sum_steps, type="l", xlab="5-minite Interval", ylab="Number of Steps", main="Weekday")
 ```
 
